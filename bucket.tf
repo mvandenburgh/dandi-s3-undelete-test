@@ -23,8 +23,7 @@ data "aws_iam_policy_document" "prevent_deletion_of_object_versions" {
     ]
 
     resources = [
-      aws_s3_bucket.source.arn,
-      "${aws_s3_bucket.source.arn}/*",
+      "${aws_s3_bucket.source.arn}/*"
     ]
 
     principals {
