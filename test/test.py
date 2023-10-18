@@ -47,3 +47,17 @@ def test_deletion() -> None:
         "Message": "Access Denied",
     }
     assert e.value.response["ResponseMetadata"]["HTTPStatusCode"] == 403
+
+    # Upload the exact same object again. This should create a new version of the
+    # object *without* a delete marker.
+    resp = client.put_object(Bucket=BUCKET_NAME, Key=key, Body=body)
+    assert resp["ResponseMetadata"]["HTTPStatusCode"] == 200
+
+    # Now there should be two versions of the object - the old one with the delete marker
+    # on it, and the newly uploaded one without a delete marker.
+    resp = client.list_object_versions(Bucket=BUCKET_NAME, Prefix=key)
+    assert resp["ResponseMetadata"]["HTTPStatusCode"] == 200
+    versions = resp["Versions"]
+    assert len(versions) == 2
+    delete_markers = resp["DeleteMarkers"]
+    assert len(delete_markers) == 1
